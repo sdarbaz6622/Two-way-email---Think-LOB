@@ -11,8 +11,10 @@ Run with:  streamlit run app.py
 """
 
 import os
+import re
 import subprocess
 import tempfile
+from email.message import EmailMessage
 from html import escape
 from io import BytesIO
 
@@ -953,6 +955,35 @@ Write-Output "SAVED"
 """
 
 
+# Outlook automation only exists on Windows. On Streamlit Cloud (Linux) the app
+# offers a ready-made draft file (.eml) instead.
+CAN_AUTOMATE_OUTLOOK = os.name == "nt"
+
+
+def build_eml(subject, html_body, attachment_name, attachment_data, to="", cc=""):
+    """Unsent email file: opens in Outlook as a draft ready to send."""
+
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    if to:
+        msg["To"] = ", ".join(a.strip() for a in to.split(";") if a.strip())
+    if cc:
+        msg["Cc"] = ", ".join(a.strip() for a in cc.split(";") if a.strip())
+    msg["X-Unsent"] = "1"  # tells Outlook to open it as an editable draft
+
+    plain = re.sub(r"<[^>]+>", " ", html_body)
+    plain = re.sub(r"\s+", " ", plain.replace("&nbsp;", " ")).strip()
+    msg.set_content(plain)
+    msg.add_alternative(html_body, subtype="html")
+    msg.add_attachment(
+        attachment_data,
+        maintype="application",
+        subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename=attachment_name,
+    )
+    return msg.as_bytes()
+
+
 def create_outlook_draft(subject, html_body, attachment_name, attachment_data, to="", cc=""):
     """Save an unsent draft (with attachment) in the signed-in Exchange mailbox."""
 
@@ -1148,7 +1179,32 @@ def main():
     to = st.text_area("To", value=clean_recipients(DEFAULT_TO), height=110)
     cc = st.text_area("CC", value=DEFAULT_CC, height=68)
 
-    if st.button("📝 Create Draft in Outlook (To, CC and Excel included)"):
+    eml_data = build_eml(
+        subject=subject,
+        html_body=outlook_html(email_body),
+        attachment_name=excel_name,
+        attachment_data=excel_data,
+        to=clean_recipients(to),
+        cc=clean_recipients(cc),
+    )
+    eml_name = f"Pending_2Way_Emails_{report_date.strftime('%d_%b_%Y')}.eml"
+
+    if not CAN_AUTOMATE_OUTLOOK:
+        st.info(
+            "Download the draft below and double-click it: Outlook opens it as a new "
+            "email with To, CC, subject, the formatted body and the Excel attached. "
+            "Review it and click Send.\n\n"
+            "If it opens as a read-only message instead, right-click the file → "
+            "Open with → Outlook (classic)."
+        )
+        st.download_button(
+            label="📥 Download Outlook Draft (.eml)",
+            data=eml_data,
+            file_name=eml_name,
+            mime="message/rfc822",
+        )
+
+    elif st.button("📝 Create Draft in Outlook (To, CC and Excel included)"):
         try:
             with st.spinner("Saving the draft to your mailbox..."):
                 create_outlook_draft(
