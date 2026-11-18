@@ -417,7 +417,7 @@ def validate(mapped, tl_summary, report):
 # EXCEL
 # ============================================================
 
-HEADER_FONT = Font(name="Arial", size=10, bold=True, color="#f2f2f2")
+HEADER_FONT = Font(name="Arial", size=10, bold=True, color="f2f2f2")
 NORMAL_FONT = Font(name="Arial", size=10)
 BOLD_FONT = Font(name="Arial", size=10, bold=True, color="173B5A")
 GRAND_FONT = Font(name="Arial", size=10, bold=True, color="FFFFFF")
@@ -1201,11 +1201,9 @@ def main():
 
     if not CAN_AUTOMATE_OUTLOOK:
         st.info(
-            "Download the draft below and double-click it: Outlook opens it as a new "
-            "email with To, CC, subject, the formatted body and the Excel attached. "
-            "Review it and click Send.\n\n"
-            "If it opens as a read-only message instead, right-click the file → "
-            "Open with → Outlook (classic)."
+             "Download the Outlook draft below. Open the .eml file "
+    "with New Outlook to review the recipients, subject, "
+    "formatted email body and Excel attachment."
         )
         st.download_button(
             label="📥 Download Outlook Draft (.eml)",
