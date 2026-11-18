@@ -688,14 +688,24 @@ def _table(width):
 
 def _th(text, width, theme, bg=None):
     bg = bg or theme["header_bg"]
-    return (
-        f'<th width="{width}" bgcolor="{bg}" style="width:{width}px;{FONT}font-size:11px;'
-        f'font-weight:bold;color:{theme["header_fg"]};background-color:{bg};'
-        f'border:1px solid {theme["header_border"]};padding:5px 4px;text-align:center;'
-        'vertical-align:middle;line-height:14px;mso-line-height-rule:exactly;">'
-        f"{text}</th>"
-    )
 
+    return (
+        f'<th width="{width}" bgcolor="{bg}" '
+        f'style="width:{width}px;{FONT}font-size:11px;'
+        'font-weight:bold;'
+        'color:#FFFFFF !important;'
+        f'background-color:{bg};'
+        f'border:1px solid {theme["header_border"]};'
+        'padding:5px 4px;'
+        'text-align:center;'
+        'vertical-align:middle;'
+        'line-height:14px;'
+        'mso-line-height-rule:exactly;">'
+        '<span style="color:#FFFFFF !important;font-weight:bold;">'
+        f'{text}'
+        '</span>'
+        '</th>'
+    )
 
 def _td(text, theme, bg, color="#262626", bold=False, align="center", indent=6):
     weight = "bold" if bold else "normal"
