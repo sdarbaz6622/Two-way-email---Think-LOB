@@ -417,7 +417,7 @@ def validate(mapped, tl_summary, report):
 # EXCEL
 # ============================================================
 
-HEADER_FONT = Font(name="Arial", size=10, bold=True, color="FFFFFF")
+HEADER_FONT = Font(name="Arial", size=10, bold=True, color="#f2f2f2")
 NORMAL_FONT = Font(name="Arial", size=10)
 BOLD_FONT = Font(name="Arial", size=10, bold=True, color="173B5A")
 GRAND_FONT = Font(name="Arial", size=10, bold=True, color="FFFFFF")
